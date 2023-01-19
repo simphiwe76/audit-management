@@ -1,0 +1,54 @@
+app:
+  minimum-hash-length: 0
+  hash-id-salt: 0-8-6-8-1-2-2-8-5
+  hash-id-alphabet: abcdefghijklmnopqrstuvwxyz1234567890
+
+spring:
+  main:
+    allow-circular-references: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/Microservices
+          jwk-set-uri: http://localhost:8180/realms/Microservices/protocol/openid-connect/certs
+
+#TODO add postgres add config ddl to update
+  datasource:
+    url: ${DATABASE_CONNECTION_URL:jdbc:postgresql://localhost:5432/dot360Microservice}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:1234}
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
+    defer-datasource-initialization: false
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+  kafka:
+    properties:
+      security.protocol: PLAINTEXT
+    producer:
+      bootstrap-servers: http://localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: http://localhost:9092
+      group-id: audit-management
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+server:
+  error:
+    include-stacktrace: always
+  servlet:
+    context-path: /
+  forward-headers-strategy: framework
+
